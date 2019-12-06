@@ -13,7 +13,6 @@ help() {
   echo "--cpu [N.]: the number of threads to use to build the source (default: the number of hardware threads available)."
   echo "--dir [PATH]: a path within the container to store the sources (default: /tmp)."
   echo "--config [CONFIG]: the configuration to use (default: defconfig)."
-
 }
 
 while [ $# -ne 0 ] ; do
@@ -48,7 +47,12 @@ while [ $# -ne 0 ] ; do
 done
 
 test -n "$URL" || {
-  URL=$(curl --silent https://www.kernel.org/index.html | grep -A1 'latest_button' | tail -1 | sed -E 's/.*href="([^"]+)".*/\1/')
+
+  URL=$(curl --silent https://www.kernel.org/index.html | \
+        grep -A1 'latest_button' | \
+        tail -1 | \
+        sed -E 's/.*href="([^"]+)".*/\1/')
+
   echo "$URL" | grep -qE '^https?://' || {
     echo 'Cannot determine the URL to the latest source'
     exit 1
@@ -60,7 +64,7 @@ SRC=$(echo $TAR | sed -E 's/(.+)\.tar\.[xg]z/\1/')
 VER=$(echo $SRC | sed -E 's/linux-([0-9.]+)/\1/')
 
 test -n "$VER" || {
-  echo "Unexpected format for the URL: $URL"
+  echo "Unexpected format for the URL: '$URL'"
   exit 1
 }
 
